@@ -1,7 +1,7 @@
 # Microservices Distributed Tracing with X-Ray on AWS EKS
 
 ## Step-01: Introduction
-### Introduction to AWS XRay & k8s DaemonSets 
+### Introduction to AWS XRay & k8s DaemonSets
 - Understand about AWS X-Ray Services
 - Understand Kubernetes DaemonSets
 - Understand the AWS X-Ray and Microservices network design on EKS Cluster
@@ -21,11 +21,11 @@
 
 ### AWS RDS Database
 - We have created AWS RDS Database as part of section [06-EKS-Storage-with-RDS-Database](/06-EKS-Storage-with-RDS-Database/README.md)
-- We even created a `externalName service: 01-MySQL-externalName-Service.yml` in our Kubernetes manifests to point to that RDS Database. 
+- We even created a `externalName service: 01-MySQL-externalName-Service.yml` in our Kubernetes manifests to point to that RDS Database.
 
 ### ALB Ingress Controller & External DNS
 - We are going to deploy a application which will also have a `ALB Ingress Service` and also will register its DNS name in Route53 using `External DNS`
-- Which means we should have both related pods running in our EKS cluster. 
+- Which means we should have both related pods running in our EKS cluster.
 - We have installed **ALB Ingress Controller** as part of section [08-01-ALB-Ingress-Install](/08-ELB-Application-LoadBalancers/08-01-ALB-Ingress-Install/README.md)
 - We have installed **External DNS** as part of section [08-06-01-Deploy-ExternalDNS-on-EKS](/08-ELB-Application-LoadBalancers/08-06-ALB-Ingress-ExternalDNS/08-06-01-Deploy-ExternalDNS-on-EKS/README.md)
 ```
@@ -51,7 +51,7 @@ eksctl create iamserviceaccount \
 eksctl create iamserviceaccount \
     --name xray-daemon \
     --namespace default \
-    --cluster eksdemo1 \
+    --cluster eksrtls1 \
     --attach-policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess \
     --approve \
     --override-existing-serviceaccounts
@@ -66,7 +66,7 @@ kubectl get sa
 kubectl describe sa xray-daemon
 
 # List IAM Roles on eksdemo1 Cluster created with eksctl
-eksctl  get iamserviceaccount --cluster eksdemo1
+eksctl  get iamserviceaccount --cluster eksrtls1
 ```
 
 ## Step-04: Update IAM Role ARN in xray-k8s-daemonset.yml
@@ -87,7 +87,7 @@ metadata:
   namespace: default
   # Update IAM Role ARN created for X-Ray access
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::180789647333:role/eksctl-eksdemo1-addon-iamserviceaccount-defa-Role1-20F5AWU2J61F
+    eks.amazonaws.com/role-arn: arn:aws:iam::001291461938:role/eksctl-eksrtls1-addon-iamserviceaccount-defa-Role1-KQP81NAO7RZ2
 ```
 
 ### Deploy X-Ray DaemonSet on our EKS Cluster
@@ -100,7 +100,7 @@ kubectl get deploy,svc,pod
 
 # Verify X-Ray Logs
 kubectl logs -f <X-Ray Pod Name>
-kubectl logs -f xray-daemon-phszp  
+kubectl logs -f xray-daemon-phszp
 
 # List & Describe DaemonSet
 kubectl get daemonset
@@ -116,12 +116,12 @@ kubectl describe daemonset xray-daemon
           image: stacksimplify/kube-usermanagement-microservice:3.0.0-AWS-XRay-MySQLDB
 
 # Change-2: New Environment Variables related to AWS X-Ray
-            - name: AWS_XRAY_TRACING_NAME 
-              value: "User-Management-Microservice"                
+            - name: AWS_XRAY_TRACING_NAME
+              value: "User-Management-Microservice"
             - name: AWS_XRAY_DAEMON_ADDRESS
-              value: "xray-service.default:2000"    
-            - name: AWS_XRAY_CONTEXT_MISSING 
-              value: "LOG_ERROR"  # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured                                            
+              value: "xray-service.default:2000"
+            - name: AWS_XRAY_CONTEXT_MISSING
+              value: "LOG_ERROR"  # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured
 ```
 - **04-NotificationMicroservice-Deployment.yml**
 ```yml
@@ -132,12 +132,12 @@ kubectl describe daemonset xray-daemon
           image: stacksimplify/kube-notifications-microservice:3.0.0-AWS-XRay
 
 # Change-2: New Environment Variables related to AWS X-Ray
-            - name: AWS_XRAY_TRACING_NAME 
-              value: "V1-Notification-Microservice"              
+            - name: AWS_XRAY_TRACING_NAME
+              value: "V1-Notification-Microservice"
             - name: AWS_XRAY_DAEMON_ADDRESS
-              value: "xray-service.default:2000"      
-            - name: AWS_XRAY_CONTEXT_MISSING 
-              value: "LOG_ERROR"  # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured                                            
+              value: "xray-service.default:2000"
+            - name: AWS_XRAY_CONTEXT_MISSING
+              value: "LOG_ERROR"  # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured
 
 ```
 
@@ -149,7 +149,7 @@ kubectl describe daemonset xray-daemon
 
 # Change-2-For-You: Update with your "yourdomainname.com"
     # External DNS - For creating a Record Set in Route53
-    external-dns.alpha.kubernetes.io/hostname: services-xray.kubeoncloud.com, xraydemo.kubeoncloud.com             
+    external-dns.alpha.kubernetes.io/hostname: services-xray.kubeoncloud.com, xraydemo.kubeoncloud.com
 ```
 
 ## Step-07: Deploy Manifests
@@ -173,7 +173,7 @@ https://<Replace-your-domain-name>/usermgmt/notification-xray
 
 ## Step-09: Clean-Up
 - We are going to delete applications created as part of this section
-- We are going to leave the xray daemon set running which we will leverage in our next section canary deployments in Kubernetes on EKS. 
+- We are going to leave the xray daemon set running which we will leverage in our next section canary deployments in Kubernetes on EKS.
 ```
 # Delete Apps
 kubectl delete -f kube-manifests/02-Applications

@@ -8,11 +8,11 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app: notification-restapp     
+      app: notification-restapp
   template:
     metadata:
       labels:
-        app: notification-restapp 
+        app: notification-restapp
     spec:
       containers:
         - name: notification-service
@@ -24,15 +24,14 @@ spec:
             - name: AWS_MAIL_SERVER_HOST
               value: "smtp-service"
             - name: AWS_MAIL_SERVER_USERNAME
-              value: "AKIASUF7HC7SQJ6BCLVS"
+              value: "AKIAQATH2EUZCZ2PQFM5"
             - name: AWS_MAIL_SERVER_PASSWORD
-              value: "BARcmLiC68wgmhTy/cQvz/E8vFzeizGqdeASNtCs6+Nv"
+              value: "BMfxmRIpXONEjaY/AFAygDFrdngCAawNlWqYvRHCuKQ9"
             - name: AWS_MAIL_SERVER_FROM_ADDRESS
-              value: "stacksimplify@gmail.com"
-            - name: AWS_XRAY_TRACING_NAME 
-              value: "V1-Notification-Microservice"              
+              value: "kedwards@connectusglobal.com"
+            - name: AWS_XRAY_TRACING_NAME
+              value: "V1-Notification-Microservice"
             - name: AWS_XRAY_DAEMON_ADDRESS
-              value: "xray-service.default:2000"      
-            - name: AWS_XRAY_CONTEXT_MISSING 
-              value: "LOG_ERROR"  # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured                                            
-
+              value: "xray-service.default:2000"
+            - name: AWS_XRAY_CONTEXT_MISSING
+              value: "LOG_ERROR"  # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured

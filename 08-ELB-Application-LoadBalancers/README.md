@@ -1,7 +1,7 @@
 # Load Balancing workloads on EKS using AWS Application Load Balancer
 
 ## Topics
-- We will be looking in to this topic very extensively in a step by step and module by module model. 
+- We will be looking in to this topic very extensively in a step by step and module by module model.
 - The below will be the list of topics covered as part of AWS ALB Ingress Controller
 
 
@@ -15,16 +15,17 @@
 | 6.  | ALB Ingress External DNS |
 
 
-## References: 
+## References:
 - Good to refer all the below for additional understanding.
 
-### ALB Pre-requisite Setup - References: 
+### ALB Pre-requisite Setup - References:
 - https://github.com/kubernetes-sigs/aws-alb-ingress-controller
 - Examples:
   - https://github.com/kubernetes-sigs/aws-alb-ingress-controller/tree/master/docs/examples/2048
 
 ### AWS ALB Ingress Annotations Reference
 - https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/
+- https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/master/docs/guide/ingress/annotation.md
 
 ### eksctl getting started
 - https://eksctl.io/introduction/#getting-started

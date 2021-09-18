@@ -1,8 +1,8 @@
 # EKS - Vertical Pod Autoscaling (VPA)
 
 ## Step-01: Introduction
-- The Kubernetes Vertical Pod Autoscaler automatically adjusts the CPU and memory reservations for your pods to help "right size" your applications. 
-- This adjustment can improve cluster resource utilization and free up CPU and memory for other pods. 
+- The Kubernetes Vertical Pod Autoscaler automatically adjusts the CPU and memory reservations for your pods to help "right size" your applications.
+- This adjustment can improve cluster resource utilization and free up CPU and memory for other pods.
 
 ## Step-02: Pre-requisite - Metric server
 - Metric server should be installed & ready, we have done that as part of HPA
@@ -31,8 +31,8 @@ kubectl get pods -n kube-system
 ```yml
         resources:
           requests:
-            cpu: "5m"       
-            memory: "5Mi"   
+            cpu: "5m"
+            memory: "5Mi"
 ```
 
 - **Deploy**
@@ -54,7 +54,7 @@ http://<Worker-Node-Public-IP>:31232
 ## Step-05: Create & Deploy VPA manifest
 
 ### Create VPA Manifest
-- Create a VPA manifest for our above Application which we deployed just now. 
+- Create a VPA manifest for our above Application which we deployed just now.
 ```yml
 apiVersion: "autoscaling.k8s.io/v1beta2"
 kind: VerticalPodAutoscaler
@@ -97,13 +97,13 @@ kubectl describe vpa kubengix-vpa
 kubectl get pods -w
 
 # Terminal 2 - Generate Load
-kubectl run --generator=run-pod/v1 apache-bench -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http://vpa-demo-service-nginx.default.svc.cluster.local/
+kubectl run apache-bench -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http://vpa-demo-service-nginx.default.svc.cluster.local/
 
 # Terminal 3 - Generate Load
-kubectl run --generator=run-pod/v1 apache-bench2 -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http://vpa-demo-service-nginx.default.svc.cluster.local/
+kubectl run apache-bench2 -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http://vpa-demo-service-nginx.default.svc.cluster.local/
 
 # Terminal 4 - Generate Load
-kubectl run --generator=run-pod/v1 apache-bench3 -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http://vpa-demo-service-nginx.default.svc.cluster.local/
+kubectl run apache-bench3 -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http://vpa-demo-service-nginx.default.svc.cluster.local/
 ```
 
 ## Step-07: Describe pods which were re-launched by VPA Updater
@@ -116,7 +116,7 @@ kubectl describe pod <recently-relaunched-pod>
 ```
 
 ## Step-08: Important Nodes about VPA:
-1. VPA Updater can re-launch new pod with updated CPU and Memory when you atleast have 2 pods in a deployment. 
+1. VPA Updater can re-launch new pod with updated CPU and Memory when you atleast have 2 pods in a deployment.
 2. If we have only one pod, unless we manually delete that pod, it will not launch new pod with VPA recommended CPU and memory considerign the application availability scenario.
 
 ## Step-09: Clean-Up

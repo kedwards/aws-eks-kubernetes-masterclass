@@ -1,5 +1,7 @@
 # Annotations Reference:  https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/
-apiVersion: extensions/v1beta1
+# apiVersion: extensions/v1beta1
+# Warning: extensions/v1beta1 Ingress is deprecated in v1.14+, unavailable in v1.22+; use networking.k8s.io/v1 Ingress
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-usermgmt-restapp-service
@@ -24,17 +26,26 @@ spec:
     - http:
         paths:
           - path: /app1/*
+            pathType: Prefix
             backend:
-              serviceName: app1-nginx-nodeport-service
-              servicePort: 80                        
+              service:
+                name: app1-nginx-nodeport-service
+                port: 
+                  number: 80                        
           - path: /app2/*
+            pathType: Prefix
             backend:
-              serviceName: app2-nginx-nodeport-service
-              servicePort: 80            
+              service:
+                name: app2-nginx-nodeport-service
+                port: 
+                  number: 80            
           - path: /*
+            pathType: Prefix
             backend:
-              serviceName: usermgmt-restapp-nodeport-service
-              servicePort: 8095              
+              service:
+                name: usermgmt-restapp-nodeport-service
+                port:
+                  number: 8095              
 # Important Note-1: In path based routing order is very important, if we are going to use  "/*", try to use it at the end of all rules.         
 
     

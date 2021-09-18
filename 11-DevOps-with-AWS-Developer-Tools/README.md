@@ -16,14 +16,14 @@
 - To achive all this we need also create or update few roles
   - **STS Assume Role:** EksCodeBuildKubectlRole
     - **Inline Policy:** eksdescribe
-  - **CodeBuild Role:** codebuild-eks-devops-cb-for-pipe-service-role    
+  - **CodeBuild Role:** codebuild-eks-devops-cb-for-pipe-service-role
     - **ECR Full Access Policy:** AmazonEC2ContainerRegistryFullAccess
     - **STS Assume Policy:** eks-codebuild-sts-assume-role
         - **STS Assume Role:** EksCodeBuildKubectlRole
 
 ## Step-03: Pre-requisite check
 - We are going to deploy a application which will also have a `ALB Ingress Service` and also will register its DNS name in Route53 using `External DNS`
-- Which means we should have both related pods running in our cluster. 
+- Which means we should have both related pods running in our cluster.
 ```
 # Verify alb-ingress-controller pod running in namespace kube-system
 kubectl get pods -n kube-system
@@ -41,7 +41,7 @@ kubectl get pods
 - Make a note of Repository name
 ```
 # Sample ECR Repository URI
-180789647333.dkr.ecr.us-east-1.amazonaws.com/eks-devops-nginx
+001291461938.dkr.ecr.us-west-2.amazonaws.com/eks-devops-nginx
 ```
 
 ## Step-05: Create CodeCommit Repository
@@ -50,13 +50,13 @@ kubectl get pods
 - Create git credentials from IAM Service and make a note of those credentials.
 - Clone the git repository from Code Commit to local repository, during the process provide your git credentials generated to login to git repo
 ```
-git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/eks-devops-nginx
+git clone https://git-codecommit.us-west-2.amazonaws.com/v1/repos/eks-devops-nginx
 ```
 - Copy all files from course section **11-DevOps-with-AWS-Developer-Tools/Application-Manifests** to local repository
   - buildspec.yml
   - Dockerfile
   - app1
-    - index.html 
+    - index.html
   - kube-manifests
     - 01-DEVOPS-Nginx-Deployment.yml
     - 02-DEVOPS-Nginx-NodePortService.yml
@@ -76,7 +76,7 @@ git status
   - buildspec.yml
   - Dockerfile
   - app1
-    - index.html 
+    - index.html
   - kube-manifests
     - 01-DEVOPS-Nginx-Deployment.yml
     - 02-DEVOPS-Nginx-NodePortService.yml
@@ -84,12 +84,12 @@ git status
 
 
 ## Step-06: Create STS Assume IAM Role for CodeBuild to interact with AWS EKS
-- In an AWS CodePipeline, we are going to use AWS CodeBuild to deploy changes to our Kubernetes manifests. 
+- In an AWS CodePipeline, we are going to use AWS CodeBuild to deploy changes to our Kubernetes manifests.
 - This requires an AWS IAM role capable of interacting with the EKS cluster.
 - In this step, we are going to create an IAM role and add an inline policy `EKS:Describe` that we will use in the CodeBuild stage to interact with the EKS cluster via kubectl.
 ```
 # Export your Account ID
-export ACCOUNT_ID=180789647333
+export ACCOUNT_ID=001291461938
 
 # Set Trust Policy
 TRUST="{ \"Version\": \"2012-10-17\", \"Statement\": [ { \"Effect\": \"Allow\", \"Principal\": { \"AWS\": \"arn:aws:iam::${ACCOUNT_ID}:root\" }, \"Action\": \"sts:AssumeRole\" } ] }"
@@ -99,6 +99,8 @@ echo $TRUST
 
 # Create IAM Role for CodeBuild to Interact with EKS
 aws iam create-role --role-name EksCodeBuildKubectlRole --assume-role-policy-document "$TRUST" --output text --query 'Role.Arn'
+
+-- arn:aws:iam::001291461938:role/EksCodeBuildKubectlRole
 
 # Define Inline Policy with eks Describe permission in a file iam-eks-describe-policy
 echo '{ "Version": "2012-10-17", "Statement": [ { "Effect": "Allow", "Action": "eks:Describe*", "Resource": "*" } ] }' > /tmp/iam-eks-describe-policy
@@ -117,7 +119,7 @@ aws iam put-role-policy --role-name EksCodeBuildKubectlRole --policy-name eks-de
 kubectl get configmap aws-auth -o yaml -n kube-system
 
 # Export your Account ID
-export ACCOUNT_ID=180789647333
+export ACCOUNT_ID=001291461938
 
 # Set ROLE value
 ROLE="    - rolearn: arn:aws:iam::$ACCOUNT_ID:role/EksCodeBuildKubectlRole\n      username: build\n      groups:\n        - system:masters"
@@ -139,12 +141,12 @@ kubectl get configmap aws-auth -o yaml -n kube-system
 
 ### Environment Variables for CodeBuild
 ```
-REPOSITORY_URI = 180789647333.dkr.ecr.us-east-1.amazonaws.com/eks-devops-nginx
-EKS_KUBECTL_ROLE_ARN = arn:aws:iam::180789647333:role/EksCodeBuildKubectlRole
-EKS_CLUSTER_NAME = eksdemo1
+REPOSITORY_URI = 001291461938.dkr.ecr.us-west-2.amazonaws.com/eks-devops-nginx
+EKS_KUBECTL_ROLE_ARN = arn:aws:iam::001291461938:role/EksCodeBuildKubectlRole
+EKS_CLUSTER_NAME = eksrtls1
 ```
 
-### Review buildspec.yml 
+### Review buildspec.yml
 
 ```yml
 version: 0.2
@@ -156,10 +158,10 @@ phases:
       commands:
         # Docker Image Tag with Date Time & Code Buiild Resolved Source Version
         - TAG="$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
-        # Update Image tag in our Kubernetes Deployment Manifest        
+        # Update Image tag in our Kubernetes Deployment Manifest
         - echo "Update Image tag in kube-manifest..."
         - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' kube-manifests/01-DEVOPS-Nginx-Deployment.yml
-        # Verify AWS CLI Version        
+        # Verify AWS CLI Version
         - echo "Verify AWS CLI Version..."
         - aws --version
         # Login to ECR Registry for docker to push the image to ECR Repository
@@ -179,37 +181,35 @@ phases:
       - echo "Build completed on `date`"
       - echo "Pushing the Docker image to ECR Repository"
       - docker push $REPOSITORY_URI:$TAG
-      - echo "Docker Image Push to ECR Completed -  $REPOSITORY_URI:$TAG"    
+      - echo "Docker Image Push to ECR Completed -  $REPOSITORY_URI:$TAG"
       # Extracting AWS Credential Information using STS Assume Role for kubectl
-      - echo "Setting Environment Variables related to AWS CLI for Kube Config Setup"          
+      - echo "Setting Environment Variables related to AWS CLI for Kube Config Setup"
       - CREDENTIALS=$(aws sts assume-role --role-arn $EKS_KUBECTL_ROLE_ARN --role-session-name codebuild-kubectl --duration-seconds 900)
       - export AWS_ACCESS_KEY_ID="$(echo ${CREDENTIALS} | jq -r '.Credentials.AccessKeyId')"
       - export AWS_SECRET_ACCESS_KEY="$(echo ${CREDENTIALS} | jq -r '.Credentials.SecretAccessKey')"
       - export AWS_SESSION_TOKEN="$(echo ${CREDENTIALS} | jq -r '.Credentials.SessionToken')"
       - export AWS_EXPIRATION=$(echo ${CREDENTIALS} | jq -r '.Credentials.Expiration')
-      # Setup kubectl with our EKS Cluster              
-      - echo "Update Kube Config"      
+      # Setup kubectl with our EKS Cluster
+      - echo "Update Kube Config"
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
       # Apply changes to our Application using kubectl
-      - echo "Apply changes to kube manifests"            
+      - echo "Apply changes to kube manifests"
       - kubectl apply -f kube-manifests/
-      - echo "Completed applying changes to Kubernetes Objects"           
+      - echo "Completed applying changes to Kubernetes Objects"
       # Create Artifacts which we can use if we want to continue our pipeline for other stages
       - printf '[{"name":"01-DEVOPS-Nginx-Deployment.yml","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
-      # Additional Commands to view your credentials      
-      #- echo "Credentials Value is..  ${CREDENTIALS}"      
-      #- echo "AWS_ACCESS_KEY_ID...  ${AWS_ACCESS_KEY_ID}"            
-      #- echo "AWS_SECRET_ACCESS_KEY...  ${AWS_SECRET_ACCESS_KEY}"            
-      #- echo "AWS_SESSION_TOKEN...  ${AWS_SESSION_TOKEN}"            
-      #- echo "AWS_EXPIRATION...  $AWS_EXPIRATION"             
-      #- echo "EKS_CLUSTER_NAME...  $EKS_CLUSTER_NAME"             
+      # Additional Commands to view your credentials
+      #- echo "Credentials Value is..  ${CREDENTIALS}"
+      #- echo "AWS_ACCESS_KEY_ID...  ${AWS_ACCESS_KEY_ID}"
+      #- echo "AWS_SECRET_ACCESS_KEY...  ${AWS_SECRET_ACCESS_KEY}"
+      #- echo "AWS_SESSION_TOKEN...  ${AWS_SESSION_TOKEN}"
+      #- echo "AWS_EXPIRATION...  $AWS_EXPIRATION"
+      #- echo "EKS_CLUSTER_NAME...  $EKS_CLUSTER_NAME"
 artifacts:
-  files: 
-    - build.json   
+  files:
+    - build.json
     - kube-manifests/*
 ```
-
-
 
 ## Step-09: Create CodePipeline
 ### CodePipeline Introduction
@@ -225,12 +225,12 @@ artifacts:
   - Rest all leave to defaults and click Next
 - **Source**
   - Source Provider: AWS CodeCommit
-  - Repository Name: eks-devops-nginx 
+  - Repository Name: eks-devops-nginx
   - Branch Name: master
   - Change Detection Options: CloudWatch Events (leave to defaults)
 - **Build**
   - Build Provider:  AWS CodeBuild
-  - Region: US East (N.Virginia)  
+  - Region: US East (N.Virginia)
   - Project Name:  Click on **Create Project**
 - **Create Build Project**
   - **Project Configuration**
@@ -248,14 +248,14 @@ artifacts:
     - **Additional Configurations**
       - All leave to defaults except Environment Variables
       - Add Environment Variables
-      - REPOSITORY_URI = 180789647333.dkr.ecr.us-east-1.amazonaws.com/eks-devops-nginx
-      - EKS_KUBECTL_ROLE_ARN = arn:aws:iam::180789647333:role/EksCodeBuildKubectlRole
-      - EKS_CLUSTER_NAME = eksdemo1
+      - REPOSITORY_URI = 001291461938.dkr.ecr.us-west-2.amazonaws.com/eks-devops-nginx
+      - EKS_KUBECTL_ROLE_ARN = arn:aws:iam::001291461938:role/EksCodeBuildKubectlRole
+      - EKS_CLUSTER_NAME = eksrtls1
   - **Buildspec**
     - leave to defaults
   - **Logs**
     - Group Name: eks-deveops-cb-pipe
-    - Stream Name:     
+    - Stream Name:
 - Click on **Continue to CodePipeline**
 - We should see a message `Successfully created eks-devops-cb-for-pipe in CodeBuild.`
 - Click **Next**
@@ -264,9 +264,9 @@ artifacts:
 - **Review**
   - Review and click on **Create Pipeline**
 
-## Step-10: Updae CodeBuild Role to have access to ECR full access   
+## Step-10: Updae CodeBuild Role to have access to ECR full access
 - First pipeline run will fail as CodeBuild not able to upload or push newly created Docker Image to ECR Repostory
-- Update the CodeBuild Role to have access to ECR to upload images built by codeBuild. 
+- Update the CodeBuild Role to have access to ECR to upload images built by codeBuild.
   - Role Name: codebuild-eks-devops-cb-for-pipe-service-role
   - Policy Name: AmazonEC2ContainerRegistryFullAccess
 - Make changes to index.html (Update as V2),  locally and push change to CodeCommit
@@ -281,7 +281,7 @@ git push
 
 ## Step-11: Update CodeBuild Role to have access to STS Assume Role we have created using STS Assume Role Policy
 - Build should be failed due to CodeBuild dont have access to perform updates in EKS Cluster.
-- It even cannot assume the STS Assume role whatever we created. 
+- It even cannot assume the STS Assume role whatever we created.
 - Create STS Assume Policy and Associate that to CodeBuild Role `codebuild-eks-devops-cb-for-pipe-service-role`
 
 ### Create STS Assume Role Policy
@@ -291,13 +291,13 @@ git push
 - Actions: Under Write - Select `AssumeRole`
 - Resources: Specific
   - Add ARN
-  - Specify ARN for Role: arn:aws:iam::180789647333:role/EksCodeBuildKubectlRole
+  - Specify ARN for Role: arn:aws:iam::001291461938:role/EksCodeBuildKubectlRole
   - Click Add
 ```
 # For Role ARN, replace your account id here, refer step-07 environment variable EKS_KUBECTL_ROLE_ARN for more details
 arn:aws:iam::<your-account-id>:role/EksCodeBuildKubectlRole
 ```
-- Click on Review Policy  
+- Click on Review Policy
 - Name: eks-codebuild-sts-assume-role
 - Description: CodeBuild to interact with EKS cluster to perform changes
 - Click on **Create Policy**
@@ -328,11 +328,11 @@ http://devops.kubeoncloud.com/app1/index.html
 ```yml
 #Before
     # External DNS - For creating a Record Set in Route53
-    external-dns.alpha.kubernetes.io/hostname: devops.kubeoncloud.com   
+    external-dns.alpha.kubernetes.io/hostname: devops.kubeoncloud.com
 
 #After
     # External DNS - For creating a Record Set in Route53
-    external-dns.alpha.kubernetes.io/hostname: devops.kubeoncloud.com, devops2.kubeoncloud.com       
+    external-dns.alpha.kubernetes.io/hostname: devops.kubeoncloud.com, devops2.kubeoncloud.com
 ```
 - Commit the changes to local git repository and push to codeCommit Repository
 - Monitor the codePipeline

@@ -1,5 +1,7 @@
 # Annotations Reference:  https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/
-apiVersion: extensions/v1beta1
+# apiVersion: extensions/v1beta1
+# Warning: extensions/v1beta1 Ingress is deprecated in v1.14+, unavailable in v1.22+; use networking.k8s.io/v1 Ingress
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-usermgmt-restapp-service
@@ -23,9 +25,12 @@ spec:
     - http:
         paths:
           - path: /*
+            pathType: Prefix
             backend:
-              serviceName: usermgmt-restapp-nodeport-service
-              servicePort: 8095
+              service:
+                name: usermgmt-restapp-nodeport-service
+                port:
+                  number: 8095
       
 
     

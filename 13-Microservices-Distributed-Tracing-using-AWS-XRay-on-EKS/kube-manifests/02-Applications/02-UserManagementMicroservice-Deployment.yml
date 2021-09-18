@@ -23,7 +23,7 @@ spec:
           image: stacksimplify/kube-usermanagement-microservice:3.0.0-AWS-XRay-MySQLDB
           ports:
             - containerPort: 8095
-          imagePullPolicy: Always            
+          imagePullPolicy: Always
           env:
             - name: DB_HOSTNAME
               value: "mysql"
@@ -41,27 +41,27 @@ spec:
             - name: NOTIFICATION_SERVICE_HOST
               value: "notification-clusterip-service"
             - name: NOTIFICATION_SERVICE_PORT
-              value: "8096"    
-            - name: AWS_XRAY_TRACING_NAME 
-              value: "User-Management-Microservice"                
+              value: "8096"
+            - name: AWS_XRAY_TRACING_NAME
+              value: "User-Management-Microservice"
             - name: AWS_XRAY_DAEMON_ADDRESS
-              value: "xray-service.default:2000"    
-            - name: AWS_XRAY_CONTEXT_MISSING 
-              value: "LOG_ERROR"  # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured                                            
+              value: "xray-service.default:2000"
+            - name: AWS_XRAY_CONTEXT_MISSING
+              value: "LOG_ERROR"  # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured
           livenessProbe:
             exec:
               command:
                 - /bin/sh
                 - -c
                 - nc -z localhost 8095
-            initialDelaySeconds: 60
+            initialDelaySeconds: 10
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /usermgmt/health-status
               port: 8095
-            initialDelaySeconds: 60
-            periodSeconds: 10          
+            initialDelaySeconds: 10
+            periodSeconds: 10
 ---
 # Kubernetes Secrets
 apiVersion: v1

@@ -43,11 +43,11 @@ spec:
                 - /bin/sh
                 - -c 
                 - nc -z localhost 8095
-            initialDelaySeconds: 60
-            periodSeconds: 10
+            initialDelaySeconds: 5
+            periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /usermgmt/health-status
               port: 8095
-            initialDelaySeconds: 60
-            periodSeconds: 10          
+            initialDelaySeconds: 5
+            periodSeconds: 5          
