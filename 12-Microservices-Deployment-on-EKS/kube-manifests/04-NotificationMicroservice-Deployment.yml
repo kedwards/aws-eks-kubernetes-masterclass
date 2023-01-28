@@ -24,8 +24,17 @@ spec:
             - name: AWS_MAIL_SERVER_HOST
               value: "smtp-service"
             - name: AWS_MAIL_SERVER_USERNAME
-              value: "AKIASUF7HC7SQJ6BCLVS"
+              # value: "AKIASUF7HC7SQJ6BCLVS"
+              value: "AKIA5JV2H2WJCFSEFCXG"
             - name: AWS_MAIL_SERVER_PASSWORD
-              value: "BARcmLiC68wgmhTy/cQvz/E8vFzeizGqdeASNtCs6+Nv"
+              # value: "BARcmLiC68wgmhTy/cQvz/E8vFzeizGqdeASNtCs6+Nv"
+              value: "BJAttRlfraJUlFsmpud8HLB2N+MABCTv0SjSAX0d1Ryt"
             - name: AWS_MAIL_SERVER_FROM_ADDRESS
-              value: "stacksimplify@gmail.com"
+              value: "kevin.edwards@withreach.com"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "500m"
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"

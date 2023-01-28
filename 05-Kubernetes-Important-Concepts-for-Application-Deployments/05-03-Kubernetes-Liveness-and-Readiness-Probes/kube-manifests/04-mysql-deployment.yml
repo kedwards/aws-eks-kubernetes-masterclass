@@ -2,18 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
-spec: 
+spec:
   replicas: 1
   selector:
     matchLabels:
       app: mysql
   strategy:
-    type: Recreate 
-  template: 
-    metadata: 
-      labels: 
+    type: Recreate
+  template:
+    metadata:
+      labels:
         app: mysql
-    spec: 
+    spec:
       containers:
         - name: mysql
           image: mysql:5.6
@@ -22,16 +22,23 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: mysql-db-password
-                  key: db-password 
+                  key: db-password
           ports:
             - containerPort: 3306
-              name: mysql    
+              name: mysql
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "500m"
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"
           volumeMounts:
             - name: mysql-persistent-storage
-              mountPath: /var/lib/mysql    
+              mountPath: /var/lib/mysql
             - name: usermanagement-dbcreation-script
-              mountPath: /docker-entrypoint-initdb.d #https://hub.docker.com/_/mysql Refer Initializing a fresh instance                                            
-      volumes: 
+              mountPath: /docker-entrypoint-initdb.d #https://hub.docker.com/_/mysql Refer Initializing a fresh instance
+      volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: ebs-mysql-pv-claim

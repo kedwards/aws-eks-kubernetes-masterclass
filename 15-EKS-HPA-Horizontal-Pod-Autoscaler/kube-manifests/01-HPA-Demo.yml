@@ -15,17 +15,17 @@ spec:
         app: hpa-nginx
     spec:
       containers:
-      - name: hpa-nginx
-        image: stacksimplify/kubenginx:1.0.0
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "500Mi"
-            cpu: "200m"          
+        - name: hpa-nginx
+          image: stacksimplify/kubenginx:1.0.0
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "500Mi"
+              cpu: "200m"
 ---
 apiVersion: v1
 kind: Service
@@ -38,7 +38,6 @@ spec:
   selector:
     app: hpa-nginx
   ports:
-  - port: 80
-    targetPort: 80
-    nodePort: 31231
-   
+    - port: 80
+      targetPort: 80
+      nodePort: 31231

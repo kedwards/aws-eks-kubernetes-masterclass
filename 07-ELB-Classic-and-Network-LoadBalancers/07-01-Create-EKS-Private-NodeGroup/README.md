@@ -35,7 +35,7 @@ eksctl create nodegroup --cluster=eksdemo1 \
                         --full-ecr-access \
                         --appmesh-access \
                         --alb-ingress-access \
-                        --node-private-networking                       
+                        --node-private-networking
 ```
 
 ## Step-04: Verify if Node Group created in Private Subnets

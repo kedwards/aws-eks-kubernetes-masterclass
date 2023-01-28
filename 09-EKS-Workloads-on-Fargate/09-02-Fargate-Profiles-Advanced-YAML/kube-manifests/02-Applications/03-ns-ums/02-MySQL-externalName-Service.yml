@@ -3,8 +3,7 @@ kind: Service
 metadata:
   name: mysql
   labels:
-    runon: fargate 
-  namespace: ns-ums
+    runon: fargate
 spec:
   type: ExternalName
-  externalName: usermgmtdb.cxojydmxwly6.us-east-1.rds.amazonaws.com
+  externalName: usermgmtdb.cghgesf1wdol.us-east-1.rds.amazonaws.com

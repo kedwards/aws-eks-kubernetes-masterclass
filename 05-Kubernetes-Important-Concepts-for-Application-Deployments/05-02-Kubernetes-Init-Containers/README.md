@@ -3,7 +3,7 @@
 ## Step-01: Introduction
 - Init Containers run **before** App containers
 - Init containers can contain **utilities or setup scripts** not present in an app image.
-- We can have and run **multiple Init Containers** before App Container. 
+- We can have and run **multiple Init Containers** before App Container.
 - Init containers are exactly like regular containers, **except:**
   - Init containers always **run to completion.**
   - Each init container must **complete successfully** before the next one starts.

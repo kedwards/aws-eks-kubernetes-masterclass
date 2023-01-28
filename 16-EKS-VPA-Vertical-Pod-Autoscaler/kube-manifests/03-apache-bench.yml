@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: apache-benchmark1
+spec:
+  template:
+    spec:
+      containers:
+        - name: apache-benchmark1
+          image: httpd
+          command:
+            [
+              "ab",
+              "-n",
+              "5000000",
+              "-c",
+              "1000",
+              "http://vpa-demo-service-nginx.default.svc.cluster.local/",
+            ]
+      restartPolicy: Never
+  backoffLimit: 4
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: apache-benchmark2
+spec:
+  template:
+    spec:
+      containers:
+        - name: apache-benchmark2
+          image: httpd
+          command:
+            [
+              "ab",
+              "-n",
+              "5000000",
+              "-c",
+              "1000",
+              "http://vpa-demo-service-nginx.default.svc.cluster.local/",
+            ]
+      restartPolicy: Never
+  backoffLimit: 4
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: apache-benchmark3
+spec:
+  template:
+    spec:
+      containers:
+        - name: apache-benchmark3
+          image: httpd
+          command:
+            [
+              "ab",
+              "-n",
+              "5000000",
+              "-c",
+              "1000",
+              "http://vpa-demo-service-nginx.default.svc.cluster.local/",
+            ]
+      restartPolicy: Never
+  backoffLimit: 4

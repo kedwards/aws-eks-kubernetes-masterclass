@@ -11,7 +11,8 @@
 kubectl -n kube-system get deployment/metrics-server
 
 # Install Metrics Server
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+<!-- kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml -->
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.6.2/components.yaml
 
 # Verify
 kubectl get deployment metrics-server -n kube-system
@@ -30,9 +31,9 @@ kubectl get nodes -o wide
 http://<Worker-Node-Public-IP>:31231
 ```
 
-## Step-04: Create a Horizontal Pod Autoscaler resource for the "hpa-demo-deployment" 
-- This command creates an autoscaler that targets 50 percent CPU utilization for the deployment, with a minimum of one pod and a maximum of ten pods. 
-- When the average CPU load is below 50 percent, the autoscaler tries to reduce the number of pods in the deployment, to a minimum of one. 
+## Step-04: Create a Horizontal Pod Autoscaler resource for the "hpa-demo-deployment"
+- This command creates an autoscaler that targets 50 percent CPU utilization for the deployment, with a minimum of one pod and a maximum of ten pods.
+- When the average CPU load is below 50 percent, the autoscaler tries to reduce the number of pods in the deployment, to a minimum of one.
 - When the load is greater than 50 percent, the autoscaler tries to increase the number of pods in the deployment, up to a maximum of ten
 ```
 # Template
@@ -42,32 +43,32 @@ kubectl autoscale deployment <deployment-name> --cpu-percent=50 --min=1 --max=10
 kubectl autoscale deployment hpa-demo-deployment --cpu-percent=50 --min=1 --max=10
 
 # Describe HPA
-kubectl describe hpa/hpa-demo-deployment 
+kubectl describe hpa/hpa-demo-deployment
 
 # List HPA
-kubectl get horizontalpodautoscaler.autoscaling/hpa-demo-deployment 
+kubectl get horizontalpodautoscaler.autoscaling/hpa-demo-deployment
 ```
 
 ## Step-05: Create the load & Verify how HPA is working
 ```
 # Generate Load
-kubectl run --generator=run-pod/v1 apache-bench -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http://hpa-demo-service-nginx.default.svc.cluster.local/ 
+kubectl run --generator=run-pod/v1 apache-bench -i --tty --rm --image=httpd -- ab -n 500000 -c 1000 http://hpa-demo-service-nginx.default.svc.cluster.local/
 
 # List all HPA
 kubectl get hpa
 
 # List specific HPA
-kubectl get hpa hpa-demo-deployment 
+kubectl get hpa hpa-demo-deployment
 
 # Describe HPA
-kubectl describe hpa/hpa-demo-deployment 
+kubectl describe hpa/hpa-demo-deployment
 
 # List Pods
 kubectl get pods
 ```
 
 ## Step-06: Cooldown / Scaledown
-- Default cooldown period is 5 minutes. 
+- Default cooldown period is 5 minutes.
 - Once CPU utilization of pods is less than 50%, it will starting terminating pods and will reach to minimum 1 pod as configured.
 
 
@@ -77,13 +78,13 @@ kubectl get pods
 kubectl delete hpa hpa-demo-deployment
 
 # Delete Deployment & Service
-kubectl delete -f kube-manifests/ 
+kubectl delete -f kube-manifests/
 ```
 
 ## Step-08: Imperative vs Declarative for HPA
 - From Kubernetes v1.18 onwards, we have a declarative way of defining HPA policies using `behavior` object in yaml.
 - **Support for configurable scaling behavior**
-  - Starting from v1.18 the v2beta2 API allows scaling behavior to be configured through the HPA behavior field. 
+  - Starting from v1.18 the v2beta2 API allows scaling behavior to be configured through the HPA behavior field.
   - Behaviors are specified separately for scaling up and down in scaleUp or scaleDown section under the behavior field
 ```yml
 behavior:

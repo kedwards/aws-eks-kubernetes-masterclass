@@ -40,7 +40,7 @@ spec:
             - name: NOTIFICATION_SERVICE_HOST
               value: "notification-clusterip-service"
             - name: NOTIFICATION_SERVICE_PORT
-              value: "8096"                            
+              value: "8096"
           livenessProbe:
             exec:
               command:
@@ -54,7 +54,14 @@ spec:
               path: /usermgmt/health-status
               port: 8095
             initialDelaySeconds: 60
-            periodSeconds: 10          
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "500m"
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"
 ---
 # Kubernetes Secrets
 apiVersion: v1
@@ -66,4 +73,3 @@ type: Opaque
 data:
   # Output of echo -n 'dbpassword11' | base64
   db-password: ZGJwYXNzd29yZDEx
-

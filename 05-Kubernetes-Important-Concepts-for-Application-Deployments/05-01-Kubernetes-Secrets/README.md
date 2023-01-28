@@ -1,11 +1,11 @@
 # Kubernetes - Secrets
 
 ## Step-01: Introduction
-- Kubernetes Secrets let you store and manage sensitive information, such as passwords, OAuth tokens, and ssh keys. 
-- Storing confidential information in a Secret is safer and more flexible than putting it directly in a Pod definition or in a container image. 
+- Kubernetes Secrets let you store and manage sensitive information, such as passwords, OAuth tokens, and ssh keys.
+- Storing confidential information in a Secret is safer and more flexible than putting it directly in a Pod definition or in a container image.
 
 ## Step-02: Create Secret for MySQL DB Password
-### 
+###
 ```
 # Mac
 echo -n 'dbpassword11' | base64
@@ -19,7 +19,7 @@ kind: Secret
 metadata:
   name: mysql-db-password
 #type: Opaque means that from kubernetes's point of view the contents of this Secret is unstructured.
-#It can contain arbitrary key-value pairs. 
+#It can contain arbitrary key-value pairs.
 type: Opaque
 data:
   # Output of echo -n 'dbpassword11' | base64

@@ -8,11 +8,11 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app: notification-restapp     
+      app: notification-restapp
   template:
     metadata:
       labels:
-        app: notification-restapp 
+        app: notification-restapp
     spec:
       containers:
         - name: notification-service
@@ -24,15 +24,23 @@ spec:
             - name: AWS_MAIL_SERVER_HOST
               value: "smtp-service"
             - name: AWS_MAIL_SERVER_USERNAME
-              value: "AKIASUF7HC7SQJ6BCLVS"
+              # value: "AKIASUF7HC7SQJ6BCLVS"
+              value: "AKIA5JV2H2WJCFSEFCXG"
             - name: AWS_MAIL_SERVER_PASSWORD
-              value: "BARcmLiC68wgmhTy/cQvz/E8vFzeizGqdeASNtCs6+Nv"
+              # value: "BARcmLiC68wgmhTy/cQvz/E8vFzeizGqdeASNtCs6+Nv"
+              value: "BJAttRlfraJUlFsmpud8HLB2N+MABCTv0SjSAX0d1Ryt"
             - name: AWS_MAIL_SERVER_FROM_ADDRESS
-              value: "stacksimplify@gmail.com"
-            - name: AWS_XRAY_TRACING_NAME 
-              value: "V1-Notification-Microservice"              
+              value: "kevin.edwards@withreach.com"
+            - name: AWS_XRAY_TRACING_NAME
+              value: "V1-Notification-Microservice"
             - name: AWS_XRAY_DAEMON_ADDRESS
-              value: "xray-service.default:2000"      
-            - name: AWS_XRAY_CONTEXT_MISSING 
-              value: "LOG_ERROR"  # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured                                            
-
+              value: "xray-service.default:2000"
+            - name: AWS_XRAY_CONTEXT_MISSING
+              value: "LOG_ERROR" # Log an error and continue, Ideally RUNTIME_ERROR – Throw a runtime exception which is default option if not configured
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "500m"
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"
